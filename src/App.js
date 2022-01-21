@@ -1,23 +1,81 @@
 import logo from './logo.svg';
 import './App.css';
+import * as yup from "yup";
+import { useField, Formik, Form } from "formik";
+import { config } from "./config";
+
+
+export function createYupSchema(schema, config) {
+  const { id, validationType, validations = [] } = config;
+  if (!yup[validationType]) {
+    return schema;
+  }
+  let validator = yup[validationType]();
+
+  validations.forEach((validation) => {
+    const { params, type } = validation;
+    if (!validator[type]) {
+      return;
+    }
+    validator = validator[type](...params);
+  });
+  schema[id] = validator;
+  return schema;
+}
+
+const DynamicField = ({ label, className, ...props }) => {
+  const [field, meta] = useField(props);
+  debugger;
+
+  return (
+    <div className="field">
+      <div className="control">
+        <label htmlFor={props.id || props.name}>{label}</label>
+        <input className={className} {...field} {...props} />
+        {meta.touched && meta.error ? (
+          <div className="error">{meta.error}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 function App() {
+  const renderFormElemets = config.map((item, index) => {
+      if (item.type) {
+        return <DynamicField
+          key={index}
+          label={item.label}
+          type={item.type}
+          name={item.name}
+          placeholder={item.placeholder}
+        />
+      }
+      return <div></div>;
+  })
+  const handleInitValues = () => {
+    config.forEach(item => {
+      initValues[item.id] = item.value || "";
+    })
+  }
+
+  const initValues = {};
+  handleInitValues();
+  const yupSchema = config.reduce(createYupSchema, {});
+  const validateSchema = yup.object().shape(yupSchema);
+  const onSubmit = (values) => {
+    console.log(values);
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Form goes here</h1>
+      <Formik initialValues={initValues} validationSchema={validateSchema} onSubmit={onSubmit}>
+        {(props) => (
+          <Form className="form">
+            { renderFormElemets }
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 }

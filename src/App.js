@@ -68,7 +68,7 @@ function App() {
 
   const initValues = {};
   useEffect(() => {
-    handleInitValues(0);
+    handleInitValues();
   }, [])
   const yupSchema = config.reduce(createYupSchema, {});
   const validateSchema = yup.object().shape(yupSchema);

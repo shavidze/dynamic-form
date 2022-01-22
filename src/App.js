@@ -2,7 +2,7 @@
 import './App.css';
 import * as yup from "yup";
 import { useField, Formik, Form } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { config } from "./config";
 
 
@@ -67,7 +67,9 @@ function App() {
   }
 
   const initValues = {};
-  handleInitValues();
+  useEffect(() => {
+    handleInitValues(0);
+  }, [])
   const yupSchema = config.reduce(createYupSchema, {});
   const validateSchema = yup.object().shape(yupSchema);
   const onSubmit = (values) => {

@@ -1,7 +1,8 @@
-import logo from './logo.svg';
+
 import './App.css';
 import * as yup from "yup";
 import { useField, Formik, Form } from "formik";
+import React from "react";
 import { config } from "./config";
 
 
@@ -23,36 +24,43 @@ export function createYupSchema(schema, config) {
   return schema;
 }
 
-const DynamicField = ({ label, className, ...props }) => {
+const DynamicField = ({ keyValue, label, className="", ...props }) => {
   const [field, meta] = useField(props);
-  debugger;
-
+  field['value'] = field['value'][props.name]
   return (
-    <div className="field">
+    <div className="field" key={keyValue}>
       <div className="control">
         <label htmlFor={props.id || props.name}>{label}</label>
         <input className={className} {...field} {...props} />
-        {meta.touched && meta.error ? (
-          <div className="error">{meta.error}</div>
-        ) : null}
+        {meta.touched && meta.error? (
+          <div className="error"> {meta.error}</div>
+        ) : ''}
       </div>
     </div>
   );
 }
 
 function App() {
-  const renderFormElemets = config.map((item, index) => {
+  const renderFormElemets = () => config.map((item, index) => {
+
       if (item.type) {
-        return <DynamicField
-          key={index}
-          label={item.label}
-          type={item.type}
-          name={item.name}
-          placeholder={item.placeholder}
-        />
+        return (
+            <>
+              <DynamicField
+                keyValue={item.id}
+                label={item.label}
+                className="tx"
+                type={item.type}
+                name={item.id}
+                placeholder={item.placeholder}
+              />
+            </>
+          )
       }
-      return <div></div>;
-  })
+      return "";
+    }
+  )
+  
   const handleInitValues = () => {
     config.forEach(item => {
       initValues[item.id] = item.value || "";
@@ -72,7 +80,9 @@ function App() {
       <Formik initialValues={initValues} validationSchema={validateSchema} onSubmit={onSubmit}>
         {(props) => (
           <Form className="form">
-            { renderFormElemets }
+           <> { renderFormElemets() } </>
+              <button type="submit">Submit</button>
+
           </Form>
         )}
       </Formik>

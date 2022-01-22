@@ -26,7 +26,6 @@ export function createYupSchema(schema, config) {
 
 const DynamicField = ({ keyValue, label, className="", ...props }) => {
   const [field, meta] = useField(props);
-  field['value'] = field['value'][props.name]
   return (
     <div className="field" key={keyValue}>
       <div className="control">

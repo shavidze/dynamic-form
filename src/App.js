@@ -67,7 +67,6 @@ function App() {
   }
 
   const initValues = {};
-  
   handleInitValues();
   const yupSchema = config.reduce(createYupSchema, {});
   const validateSchema = yup.object().shape(yupSchema);
